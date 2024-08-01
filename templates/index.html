@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKU Search</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>SKU Search</h1>
+      <input type="text" id="searchInput" placeholder="Enter SKU or text" />
+      <button onclick="search()">Search</button>
+      <div id="searchResults"></div>
+    </div>
+
+    <script>
+      async function search() {
+        const query = document.getElementById("searchInput").value;
+        console.log("Search query:", query);
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/search?query=${encodeURIComponent(query)}`
+        );
+
+        if (!response.ok) {
+          console.error("Failed to fetch:", response.statusText);
+          return;
+        }
+
+        const results = await response.json();
+        console.log("Search results:", results);
+
+        const resultsDiv = document.getElementById("searchResults");
+        resultsDiv.innerHTML = "";
+
+        results.forEach((result) => {
+          const resultItem = document.createElement("div");
+          resultItem.className = "result-item";
+
+          const skuSpan = document.createElement("span");
+          skuSpan.className = "result-sku";
+          skuSpan.textContent = result.sku;
+
+          const matchSpan = document.createElement("span");
+          matchSpan.className = "result-match";
+          matchSpan.textContent = `${result.match}% match`;
+
+          resultItem.appendChild(skuSpan);
+          resultItem.appendChild(matchSpan);
+          resultsDiv.appendChild(resultItem);
+        });
+      }
+    </script>
+  </body>
+</html>
